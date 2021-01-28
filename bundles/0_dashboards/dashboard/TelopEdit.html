@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<body>
+	<!--<label>Telop/Users</label>
+	<br>
+	<input id="nameInput" type="text"></input>-->
+	<div><p><b>Telop</b></p>
+	<textarea id="nameInput"  type="text" cols="50" rows="5"></textarea>
+	<button id="submitButton">Apply</button></hr>
+	</div>
+	<div><p><b>Account</b></p>
+		<select id="account">
+		<option value="account1" selected>account1</option>
+		<option value="account2">account2</option>
+		</select>
+	</div>
+	<div><p><b>ストップウォッチ</p></b>
+		<form name="PlayTime" id="PlayTime">
+			<p id="time">
+				00:00:00.00
+			</p>
+			<button type="button" id="btnStart" onclick="startStop()">
+				スタート
+			</button>
+			<button type="button" id="btnClear" onclick="resetStopWatch()">
+				クリア
+			</button>
+		</form>
+	</div>
+</body>
+
+<script src="stopWatch.js"></script>
+<script>
+	const nameInput = document.querySelector('#nameInput');
+	const submitButton = document.querySelector('#submitButton');
+	const accountInput = document.querySelector('#account');
+	const accountReplicant = nodecg.Replicant('account');
+	const nameReplicant = nodecg.Replicant('Telopstr');
+
+	nameReplicant.on('change', (newValue, oldValue) => {
+		// The value of the Replicant has changed somewhere in NodeCG,
+		// this could be another dashboard panel, a server initiated change,
+		// or the doing of another user accessing your dashboard panel.
+		nameInput.value = newValue;
+	});
+	accountReplicant.on('change', (newValue) => {
+		accountInput.selectedIndex = newValue;
+	});
+	accountInput.onchange = () => {
+		accountReplicant.value = accountInput.selectedIndex;
+	};
+
+	submitButton.onclick = () => {
+		// A Replicant can be modified by modifying its `value`.
+		nameReplicant.value = nameInput.value;
+	};
+</script>
+</html>

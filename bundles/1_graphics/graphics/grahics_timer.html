@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta content="text/html; charset=shift_jis" http-equiv="Content-Type" />
+	<link rel="stylesheet" href="grahics.css" type="text/css">
+</head>
+<body>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<div class = "layer1">
+		<div class = "bg_color">
+			<div class = "upper_bg">
+			</div>
+			<div class = "bottom_bg">
+				<div class="telop_field">
+					<marquee>
+						<div id="Telop"></div>
+					</marquee>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="layer2">
+		<div class="user_info">
+			<div class="img_fade">
+				<img id="info_img" style="float: left; margin-right: 5px;"></img>
+				<div id="info_text"></div>
+			</div>
+			<div class="text_fade">
+			</div>
+		</div>
+	</div>
+	<div class="layer3">
+		<div class="time">
+		<p id="PlayTime">
+			00:00:00.00
+		</p>
+		</div>
+	</div>
+</body>
+
+<script>
+	const nameReplicant = nodecg.Replicant('Telopstr', '0_dashboards');
+	nameReplicant.on('change', (newValue, oldValue) => {
+		Telop.innerText = `${newValue}`;
+	});
+	const timerReplicant = nodecg.Replicant('timer', '0_dashboards');
+	timerReplicant.on('change', (newValue, oldValue) => {
+		PlayTime.innerText = `${newValue}`;
+	});
+
+		// Read json
+		const infoArray = [];
+	const makeAccountInfo = function (account) {
+		const personaldata = [];
+		personaldata.push(["img/twitter.png", account.twitter]);
+		personaldata.push(["img/twitch.png", account.twitch]);
+		personaldata.push(["img/youtube.png", account.youtube]);
+		personaldata.push(["img/nico.png", account.niconico]);
+		personaldata.push(["img/steam.png", account.steam]);
+		return personaldata;
+	}
+	const getJson = function (){
+		var xmlhttp = new XMLHttpRequest();
+		xmlhttp.onreadystatechange = function () {
+			if (xmlhttp.readyState == 4) {
+				if (xmlhttp.status == 200) {
+					const data = JSON.parse(xmlhttp.responseText);
+					infoArray.push(makeAccountInfo(data.account1));
+					infoArray.push(makeAccountInfo(data.account2));
+				}
+			}
+		}
+		xmlhttp.open("GET", "data.json");
+		xmlhttp.send();
+	}
+	getJson();
+
+	// Account Number
+	const accountReplicant = nodecg.Replicant('account', '0_dashboards');
+	let accountNum = 0;
+	accountReplicant.on('change', (newValue) => {
+	accountNum = newValue;
+	});
+
+	// Display FadeText
+	let infoArrayNum = 0;
+	const fadeoutText = function() {
+		$("#info_img").fadeOut(1000);
+		$("#info_text").fadeOut(1000);
+
+		const infoArrayMax = 5;
+		infoArrayNum++;
+		if (infoArrayNum > infoArrayMax-1){
+			infoArrayNum = infoArrayNum - infoArrayMax;
+		}
+
+		const fadei = function(){
+			$("#info_img").attr('src', infoArray[accountNum][infoArrayNum][0]);
+			$("#info_text").text(infoArray[accountNum][infoArrayNum][1]);
+			$("#info_img").fadeIn(1000);
+			$("#info_text").fadeIn(1000);
+		}
+		setTimeout(fadei, 1000);
+		setTimeout(fadeoutText, 5000);
+	}
+	setTimeout(fadeoutText, 1000);
+</script>
+</html>
